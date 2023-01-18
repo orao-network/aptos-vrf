@@ -1,5 +1,5 @@
 {
-  "name": "@orao-network/orao-aptos-vrf",
+  "name": "@orao-network/aptos-vrf",
   "version": "0.1.0",
   "description": "ORAO Verifiable Random Runction for Aptos",
   "main": "dist/index.js",
