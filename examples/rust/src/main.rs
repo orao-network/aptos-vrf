@@ -73,7 +73,7 @@ pub async fn wait_fulfilled(
 ) -> Result<String> {
     let progress = ProgressBar::new_spinner();
     progress.enable_steady_tick(std::time::Duration::from_millis(120));
-    progress.set_message("Waiting for randomness being fulfilled..");
+    progress.set_message("Waiting for randomness to be fulfilled...");
 
     loop {
         let randomness = client
