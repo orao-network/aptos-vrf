@@ -1,7 +1,7 @@
 {
   "name": "@orao-network/aptos-vrf",
-  "version": "0.1.0",
-  "description": "ORAO Verifiable Random Runction for Aptos",
+  "version": "0.1.2",
+  "description": "ORAO Verifiable Random Runction for Aptos blockchain",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
@@ -34,5 +34,22 @@
   },
   "engines": {
     "node": ">=15.0.0"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/orao-network/aptos-vrf.git"
+  },
+  "keywords": [
+    "vrf",
+    "randomizer",
+    "rng",
+    "aptos",
+    "on-chain",
+    "random",
+    "number"
+  ],
+  "bugs": {
+    "url": "https://github.com/orao-network/aptos-vrf/issues"
+  },
+  "homepage": "https://github.com/orao-network/aptos-vrf#readme"
 }
