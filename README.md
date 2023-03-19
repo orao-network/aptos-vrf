@@ -9,6 +9,6 @@ This means you won't be able to request randomness from your module on Aptos usi
 - Currently we're implementing a workaround through move scripts.
 
 ## Examples
-We've prepared two off-chain usage examples.
+We've prepared two off-chain usage examples for devnet.
 - The [JS example](https://github.com/orao-network/aptos-vrf/tree/master/examples/js) provides a frontend web3 dApp built using React. We integrated Pontem wallet but any aptos browser wallet should work in this web example.
 - There's also a [Rust CLI](https://github.com/orao-network/aptos-vrf/tree/master/examples/rust) app that generates a new wallet, gets an airdrop from aptos devnet, requests and outputs randomness.
