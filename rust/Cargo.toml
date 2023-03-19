@@ -1,19 +1,20 @@
 [package]
 name = "orao-aptos-vrf"
-version = "0.1.0"
-edition = "2021"
-authors = ["ORAO Devs <hello@orao.network>"]
-homepage = "https://orao.network"
-repository = "https://github.com/orao-network/vrf-aptos"
+version = { workspace = true }
+authors = { workspace = true }
+homepage = { workspace = true }
+repository = { workspace = true }
+rust-version = { workspace = true }
+edition = { workspace = true }
 license = "Apache-2.0"
-keywords = ["aptos", "vrf", "ed25519"]
+keywords = ["aptos", "vrf", "ed25519", "randomness", "randomizer"]
 description = "ORAO Verifiable Random Function for Aptos."
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-anyhow = "1.0.65"
-aptos-sdk = { git = "https://github.com/aptos-labs/aptos-core", branch = "devnet" }
-hex = "0.4.3"
+anyhow = { workspace = true }
+aptos-sdk = { workspace = true }
+hex = { workspace = true }
 url = "2.3.1"
-serde = "1.0.147"
+serde = { workspace = true }

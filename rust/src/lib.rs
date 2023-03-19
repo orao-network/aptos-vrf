@@ -47,7 +47,7 @@ impl OraoVrf {
         Self {
             api_client,
             vrf_address: AccountAddress::from_hex_literal(
-                "0xb4336838101004d153183c96c5a1a63e864b99838b31deb2e125ee1726e61a26",
+                "0x16e91756990842e0848b11cbbd5671a522af7f6af1fdc98fcee09082f50f300e",
             )
             .unwrap(),
         }
@@ -132,7 +132,7 @@ impl OraoVrf {
             .await
             .context("Failed to get randomness request data")?;
         let randomness_request = response.into_inner();
-        let table_handle = get_address(randomness_request.seeds.handle)?;
+        let table_handle = get_address(&randomness_request.seeds.handle)?;
         let key_type = "vector<u8>";
         let value_type = "vector<u8>";
         let randomness = self
