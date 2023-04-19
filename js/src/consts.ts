@@ -1,2 +1,0 @@
-export const ORAO_ADDRESS =
-    "0x16e91756990842e0848b11cbbd5671a522af7f6af1fdc98fcee09082f50f300e";

@@ -6,17 +6,18 @@ use aptos_sdk::{
 };
 use indicatif::ProgressBar;
 use once_cell::sync::Lazy;
-use orao_aptos_vrf::OraoVrf;
 use url::Url;
+
+use orao_aptos_vrf::orao_vrf_client::OraoVrf;
 
 static NODE_URL: Lazy<Url> = Lazy::new(|| {
     Url::from_str(
         std::env::var("APTOS_NODE_URL")
             .as_ref()
             .map(|s| s.as_str())
-            .unwrap_or("https://fullnode.devnet.aptoslabs.com"),
+            .unwrap_or("https://fullnode.testnet.aptoslabs.com"),
     )
-    .unwrap()
+        .unwrap()
 });
 
 static FAUCET_URL: Lazy<Url> = Lazy::new(|| {
@@ -24,9 +25,9 @@ static FAUCET_URL: Lazy<Url> = Lazy::new(|| {
         std::env::var("APTOS_FAUCET_URL")
             .as_ref()
             .map(|s| s.as_str())
-            .unwrap_or("https://faucet.devnet.aptoslabs.com"),
+            .unwrap_or("https://faucet.testnet.aptoslabs.com"),
     )
-    .unwrap()
+        .unwrap()
 });
 
 #[tokio::main]
@@ -45,7 +46,6 @@ async fn main() -> Result<()> {
         .context("Failed to fund Alice's account")?;
 
     let client = OraoVrf::new(NODE_URL.clone().to_string());
-    let network_config = client.get_network_config().await?;
 
     let seed = rand::random::<[u8; 32]>().to_vec();
 
@@ -54,11 +54,12 @@ async fn main() -> Result<()> {
         hex::encode(seed.clone())
     );
 
-    let hash = client
-        .request(&mut alice, seed.clone(), network_config.coin_type, None)
+    let pt = client
+        .request(&mut alice, seed.clone(), None)
         .await?;
+    println!("Request performed in {}", pt.hash);
 
-    println!("Request performed in {}", hash);
+    client.api_client.wait_for_transaction(&pt).await?;
 
     let randomness = wait_fulfilled(&client, &alice.address(), &seed).await?;
     println!("Randomness: {}", randomness);
@@ -72,7 +73,7 @@ pub async fn wait_fulfilled(
     seed: &Vec<u8>,
 ) -> Result<String> {
     let progress = ProgressBar::new_spinner();
-    progress.enable_steady_tick(std::time::Duration::from_millis(120));
+    progress.enable_steady_tick(Duration::from_millis(120));
     progress.set_message("Waiting for randomness to be fulfilled...");
 
     loop {

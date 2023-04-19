@@ -1,0 +1,20 @@
+[package]
+name = 'russian-roulette'
+version = '1.0.0'
+
+[dependencies.AptosFramework]
+git = 'https://github.com/aptos-labs/aptos-core.git'
+rev = 'mainnet'
+subdir = 'aptos-move/framework/aptos-framework'
+
+[dependencies.orao-vrf]
+local = "../../move"
+
+[addresses]
+russian_roulette = "0x27ee29aeb6ac1a68a997d60fbc97e6cc28fdf28ea76eb149e8e6aa50c9734b75"
+
+# Addresses for tests.
+test_auth1 = "0x11"
+test_auth2 = "0x12"
+test_auth3 = "0x13"
+test_requester = "0x14"

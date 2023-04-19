@@ -1,3 +1,2 @@
-export * from "./consts";
-export * from "./interfaces";
+export * from "./constants";
 export * from "./vrf";
