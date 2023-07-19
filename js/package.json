@@ -1,6 +1,6 @@
 {
   "name": "@orao-network/aptos-vrf",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "ORAO Verifiable Random Runction for Aptos blockchain",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
