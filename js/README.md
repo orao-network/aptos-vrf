@@ -23,3 +23,4 @@ console.log("Your randomness is", randomness)
 ### Example app
 An example frontend app that uses [ORAO VRF is available](https://github.com/orao-network/aptos-vrf/tree/master/examples/js) in the examples section.
 The library interacts with Pontem wallet through a React frontend.
+Alternatively you can check out our ]frontend demo using testnet](https://developdemo.orao.network/) and Pontem wallet.
