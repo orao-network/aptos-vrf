@@ -1,7 +1,7 @@
-import {AptosAccount, FaucetClient} from "aptos";
+import { AptosAccount, FaucetClient } from "aptos";
 import * as dotenv from "dotenv";
-import {randomBytes} from "crypto";
-import {OraoVrfClient} from "../src";
+import { randomBytes } from "crypto";
+import { OraoVrfClient } from "../.";
 
 dotenv.config();
 
@@ -23,7 +23,7 @@ describe("vrf", () => {
 
     it("request", async () => {
         const seed = new Uint8Array(randomBytes(32));
-        let txnHash = await oraoVrf.request(alice, seed, {expireTimestamp: BigInt(50000000000)});
+        let txnHash = await oraoVrf.request(alice, seed, { expireTimestamp: BigInt(50000000000) });
         await oraoVrf.aptosClient.waitForTransaction(txnHash);
 
         console.log(seed);
