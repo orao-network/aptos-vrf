@@ -9,12 +9,14 @@ use aptos_sdk::rest_client::{Client, PendingTransaction};
 use aptos_sdk::transaction_builder::TransactionBuilder;
 use aptos_sdk::types::account_address::AccountAddress;
 use aptos_sdk::types::chain_id::ChainId;
-use aptos_sdk::types::LocalAccount;
 use aptos_sdk::types::transaction::{EntryFunction, TransactionPayload};
+use aptos_sdk::types::LocalAccount;
 use serde::{Deserialize, Serialize};
 use url::Url;
 
 use crate::utils::get_address;
+
+static VFR_ADDRESS: &str = "0xab81318c79a3b65a1f23354494793fcc6c4fa44a69d0c0e656b7b1454ddd1bbf";
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Table {
@@ -36,16 +38,14 @@ impl OraoVrf {
     pub fn new(node_url: String) -> Self {
         Self {
             api_client: Client::new(Url::from_str(&node_url).unwrap()),
-            vrf_address: AccountAddress::from_hex_literal(
-                "0xab81318c79a3b65a1f23354494793fcc6c4fa44a69d0c0e656b7b1454ddd1bbf"
-            ).unwrap(),
+            vrf_address: AccountAddress::from_hex_literal(VFR_ADDRESS).unwrap(),
         }
     }
 
-    pub async fn request(
+    async fn submit_tx(
         &self,
         user_account: &mut LocalAccount,
-        seed: Vec<u8>,
+        entry_function: EntryFunction,
         options: Option<TransactionOptions>,
     ) -> Result<PendingTransaction> {
         let options = options.unwrap_or_default();
@@ -58,14 +58,7 @@ impl OraoVrf {
             .inner()
             .chain_id;
         let transaction_builder = TransactionBuilder::new(
-            TransactionPayload::EntryFunction(EntryFunction::new(
-                ModuleId::new(self.vrf_address, Identifier::new("vrf").unwrap()),
-                Identifier::new("request").unwrap(),
-                vec![],
-                vec![
-                    bcs::to_bytes(&seed).unwrap(),
-                ],
-            )),
+            TransactionPayload::EntryFunction(entry_function),
             SystemTime::now()
                 .duration_since(UNIX_EPOCH)
                 .unwrap()
@@ -73,18 +66,37 @@ impl OraoVrf {
                 + options.timeout_secs,
             ChainId::new(chain_id),
         )
-            .sender(user_account.address())
-            .sequence_number(user_account.sequence_number())
-            .max_gas_amount(options.max_gas_amount)
-            .gas_unit_price(options.gas_unit_price);
+        .sender(user_account.address())
+        .sequence_number(user_account.sequence_number())
+        .max_gas_amount(options.max_gas_amount)
+        .gas_unit_price(options.gas_unit_price);
         let signed_txn = user_account.sign_with_transaction_builder(transaction_builder);
 
         Ok(self
             .api_client
             .submit(&signed_txn)
             .await
-            .context("Failed to submit request transaction")?
+            .context("Failed to submit transaction")?
             .into_inner())
+    }
+
+    pub async fn request(
+        &self,
+        user_account: &mut LocalAccount,
+        seed: Vec<u8>,
+        options: Option<TransactionOptions>,
+    ) -> Result<PendingTransaction> {
+        self.submit_tx(
+            user_account,
+            EntryFunction::new(
+                ModuleId::new(self.vrf_address, Identifier::new("vrf").unwrap()),
+                Identifier::new("request").unwrap(),
+                vec![],
+                vec![bcs::to_bytes(&seed).unwrap()],
+            ),
+            options,
+        )
+        .await
     }
 
     pub async fn get_randomness(

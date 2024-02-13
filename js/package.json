@@ -1,7 +1,7 @@
 {
   "name": "@orao-network/aptos-vrf",
-  "version": "0.1.7",
-  "description": "ORAO Verifiable Random Runction for Aptos blockchain",
+  "version": "0.2.0",
+  "description": "ORAO Verifiable Random Function for Aptos blockchain",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
@@ -30,7 +30,7 @@
     "typescript": "^4.8.4"
   },
   "dependencies": {
-    "aptos": "^1.7.2"
+    "aptos": "^1.21.0"
   },
   "engines": {
     "node": ">=15.0.0"

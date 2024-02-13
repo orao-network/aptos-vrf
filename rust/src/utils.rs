@@ -12,13 +12,17 @@ pub async fn get_local_account(private_key_hex: &str, node_url: String) -> Resul
     let decoded = hex::decode(private_key_hex.replace("0x", ""))?;
     let private_key = Ed25519PrivateKey::try_from(decoded.as_slice())?;
     let key = AccountKey::from_private_key(private_key);
-    let address = key.authentication_key().derived_address();
+    let address = key.authentication_key().account_address();
 
     let api_client = Client::new(Url::from_str(&node_url).unwrap());
     let account = LocalAccount::new(
         address,
         key,
-        api_client.get_account(address).await?.inner().sequence_number,
+        api_client
+            .get_account(address)
+            .await?
+            .inner()
+            .sequence_number,
     );
 
     Ok(account)

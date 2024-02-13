@@ -8,7 +8,7 @@ use indicatif::ProgressBar;
 use once_cell::sync::Lazy;
 use url::Url;
 
-use orao_aptos_vrf::orao_vrf_client::OraoVrf;
+use orao_aptos_vrf::orao_vrf_v2_client::OraoVrfV2;
 
 static NODE_URL: Lazy<Url> = Lazy::new(|| {
     Url::from_str(
@@ -17,7 +17,7 @@ static NODE_URL: Lazy<Url> = Lazy::new(|| {
             .map(|s| s.as_str())
             .unwrap_or("https://fullnode.testnet.aptoslabs.com"),
     )
-        .unwrap()
+    .unwrap()
 });
 
 static FAUCET_URL: Lazy<Url> = Lazy::new(|| {
@@ -27,7 +27,7 @@ static FAUCET_URL: Lazy<Url> = Lazy::new(|| {
             .map(|s| s.as_str())
             .unwrap_or("https://faucet.testnet.aptoslabs.com"),
     )
-        .unwrap()
+    .unwrap()
 });
 
 #[tokio::main]
@@ -45,7 +45,7 @@ async fn main() -> Result<()> {
         .await
         .context("Failed to fund Alice's account")?;
 
-    let client = OraoVrf::new(NODE_URL.clone().to_string());
+    let client = OraoVrfV2::new(NODE_URL.clone().to_string());
 
     let seed = rand::random::<[u8; 32]>().to_vec();
 
@@ -54,9 +54,7 @@ async fn main() -> Result<()> {
         hex::encode(seed.clone())
     );
 
-    let pt = client
-        .request(&mut alice, seed.clone(), None)
-        .await?;
+    let pt = client.request(&mut alice, seed.clone(), None).await?;
     println!("Request performed in {}", pt.hash);
 
     client.api_client.wait_for_transaction(&pt).await?;
@@ -68,7 +66,7 @@ async fn main() -> Result<()> {
 }
 
 pub async fn wait_fulfilled(
-    client: &OraoVrf,
+    client: &OraoVrfV2,
     address: &AccountAddress,
     seed: &Vec<u8>,
 ) -> Result<String> {
@@ -81,7 +79,7 @@ pub async fn wait_fulfilled(
             .get_randomness(*address, format!("0x{}", hex::encode(seed)))
             .await?;
         if randomness != "0x" {
-            break Ok(randomness)
+            break Ok(randomness);
         }
         sleep(Duration::from_secs(1));
     }

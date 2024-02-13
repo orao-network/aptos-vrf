@@ -1,29 +1,36 @@
-import {
-    AptosAccount,
-    AptosClient,
-    getAddressFromAccountOrAddress,
-    HexString,
-    MaybeHexString,
-    OptionalTransactionArgs,
-    TransactionBuilderABI
-} from "aptos";
-import {ORAO_ADDRESS, VRF_ABIS} from ".";
+import {AptosAccount, getAddressFromAccountOrAddress, MaybeHexString, Network, Provider, Types,} from "aptos";
+import {ORAO_ADDRESS} from ".";
 
 /**
  * Class for working with the ORAO Vrf module, such as requesting randomness and
  * getting fulfilled randomness.
  */
 export class OraoVrfClient {
-    aptosClient: AptosClient;
-    transactionBuilder: TransactionBuilderABI;
+    provider: Provider;
 
     /**
      * Creates new OraoVrfClient instance
-     * @param nodeUrl string
+     * @param network string
      */
-    constructor(nodeUrl: string) {
-        this.aptosClient = new AptosClient(nodeUrl);
-        this.transactionBuilder = new TransactionBuilderABI(VRF_ABIS.map((abi) => new HexString(abi).toUint8Array()));
+    constructor(network: Network) {
+        this.provider = new Provider(network);
+    }
+
+    protected async submitTransaction(
+        account: AptosAccount,
+        payload: Types.EntryFunctionPayload,
+        options?: Partial<Types.SubmitTransactionRequest>
+    ): Promise<string> {
+        const rawTxn = await this.provider.generateTransaction(
+            account.address(),
+            payload,
+            options
+        );
+
+        const bcsTxn = await this.provider.signTransaction(account, rawTxn);
+        const pendingTxn = await this.provider.submitTransaction(bcsTxn);
+
+        return pendingTxn.hash;
     }
 
     /**
@@ -35,53 +42,52 @@ export class OraoVrfClient {
      */
     requestPayload(seed: Uint8Array) {
         return {
-            type: 'entry_function_payload',
+            type: "entry_function_payload",
             function: `${ORAO_ADDRESS}::vrf::request`,
             type_arguments: [],
-            arguments: [seed], 
-        }
+            arguments: [seed],
+        };
     }
-    
+
     /**
      * Generate, sign, and submit a transaction to the Aptos blockchain API to
      * request randomness.
      *
      * @param user Account requesting the randomness
      * @param seed Uint8Array
-     * @param extraArgs Extra args for building the transaction or configuring how
-     * the client should submit and wait for the transaction
+     * @param options Options allow to overwrite default transaction options.
      * @returns The hash of the transaction submitted to the API
      */
     async request(
         user: AptosAccount,
         seed: Uint8Array,
-        extraArgs?: OptionalTransactionArgs
+        options?: Partial<Types.SubmitTransactionRequest>
     ): Promise<string> {
-        const payload = this.transactionBuilder.buildTransactionPayload(
-            `${ORAO_ADDRESS}::vrf::request`,
-            [],
-            [seed]
-        );
-
-        return this.aptosClient.generateSignSubmitTransaction(user, payload, extraArgs);
+        return this.submitTransaction(user, this.requestPayload(seed), options);
     }
 
-    async waitFulfilled(owner: MaybeHexString, seed: Uint8Array): Promise<Uint8Array> {
+    async waitFulfilled(
+        owner: MaybeHexString,
+        seed: Uint8Array
+    ): Promise<Uint8Array> {
         return new Promise(async (resolve, reject) => {
             while (true) {
                 try {
-                    const randomness = await this.getRandomness(owner, Buffer.from(seed).toString("hex"))
-                    if (randomness != '0x') {
-                        resolve(randomness)
+                    const randomness = await this.getRandomness(
+                        owner,
+                        Buffer.from(seed).toString("hex")
+                    );
+                    if (randomness != "0x") {
+                        resolve(randomness);
                         break;
                     }
                 } catch (e) {
                     reject(e);
                     break;
                 }
-                await new Promise(f => setTimeout(f, 1000));
+                await new Promise((f) => setTimeout(f, 1000));
             }
-        })
+        });
     }
 
     /**
@@ -93,15 +99,15 @@ export class OraoVrfClient {
      */
     async getRandomness(
         account: AptosAccount | MaybeHexString,
-        seed: string
+        seed: MaybeHexString
     ): Promise<any> {
         const accountAddress = getAddressFromAccountOrAddress(account);
-        const randomnessStoreResource = await this.aptosClient.getAccountResource(
+        const randomnessStoreResource = await this.provider.getAccountResource(
             accountAddress,
             `${ORAO_ADDRESS}::vrf::RandomnessStore`
         );
 
-        return await this.aptosClient.getTableItem(
+        return await this.provider.getTableItem(
             (randomnessStoreResource.data as any).data.handle,
             {
                 key_type: `vector<u8>`,

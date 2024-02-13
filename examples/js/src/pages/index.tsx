@@ -1,7 +1,9 @@
-import Layout from "../components/Layout";
-import {OraoVrfClient} from "orao-aptos-vrf";
 import {useEffect, useState} from "react";
+
 import {randomBytes} from "crypto";
+
+import Layout from "../components/Layout";
+import {OraoVrfV2Client} from "orao-aptos-vrf";
 
 export default function HomePage() {
   const [seed, setSeed] = useState<Uint8Array>(new Uint8Array([]))
@@ -9,13 +11,13 @@ export default function HomePage() {
 
   const handleRequest = async () => {
     const network = await window.pontem!.network()
-    const vrf = new OraoVrfClient(network.api)
+    const vrf = new OraoVrfV2Client(network.api)
 
     const seed = new Uint8Array(randomBytes(32));
     try {
       const payload = vrf.requestPayload(seed);
       const response = await window.pontem!.signAndSubmit(payload);
-      await vrf.aptosClient.waitForTransaction(response?.hash || "");
+      await vrf.provider.waitForTransaction(response?.hash || "");
       console.log(response?.hash)
     } catch (error: any) {
       console.log("error", error);
@@ -27,7 +29,7 @@ export default function HomePage() {
     if (seed.length) {
       (async () => {
         const network = await window.pontem!.network()
-        const vrf = new OraoVrfClient(network.api)
+        const vrf = new OraoVrfV2Client(network.api)
 
         const owner = await window.pontem!.account()
 

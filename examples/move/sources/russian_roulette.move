@@ -2,10 +2,9 @@ module russian_roulette::roulette {
     use std::option::{Self, Option};
     use std::signer;
     use std::vector;
-
     use aptos_std::simple_map::{Self, SimpleMap};
 
-    use orao_network::vrf;
+    use orao_network::vrf_v2;
 
     //
     // Errors
@@ -58,7 +57,7 @@ module russian_roulette::roulette {
         assert!(option::is_none(&player_state.force), E_ALREADY_PLAYED);
 
         player_state.force = option::some(force);
-        vrf::request(user, force);
+        vrf_v2::request(user, force);
     }
 
     public entry fun result(user: &signer) acquires PlayerState, GameStore {
@@ -68,7 +67,7 @@ module russian_roulette::roulette {
 
         assert!(option::is_some(&player_state.force), E_NOT_PLAYED);
 
-        let randomness = vrf::get_randomness(user_addr, option::extract(&mut player_state.force));
+        let randomness = vrf_v2::get_randomness(user_addr, option::extract(&mut player_state.force));
 
         let game_store = borrow_global_mut<GameStore>(@russian_roulette);
         if (!simple_map::contains_key(&game_store.statistics, &user_addr)) {

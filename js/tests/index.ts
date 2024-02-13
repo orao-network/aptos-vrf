@@ -1,7 +1,7 @@
-import { AptosAccount, FaucetClient } from "aptos";
+import { AptosAccount, FaucetClient, Network } from "aptos";
 import * as dotenv from "dotenv";
 import { randomBytes } from "crypto";
-import { OraoVrfClient } from "../.";
+import { OraoVrfClient } from "../src";
 
 dotenv.config();
 
@@ -13,7 +13,7 @@ describe("vrf", () => {
 
     const faucetClient = new FaucetClient(NODE_URL, FAUCET_URL);
 
-    const oraoVrf = new OraoVrfClient(NODE_URL);
+    const oraoVrf = new OraoVrfClient(Network.TESTNET);
 
     const alice = new AptosAccount();
 
@@ -23,14 +23,19 @@ describe("vrf", () => {
 
     it("request", async () => {
         const seed = new Uint8Array(randomBytes(32));
-        let txnHash = await oraoVrf.request(alice, seed, { expireTimestamp: BigInt(50000000000) });
-        await oraoVrf.aptosClient.waitForTransaction(txnHash);
+        let txnHash = await oraoVrf.request(alice, seed, {
+            expiration_timestamp_secs: "50000000000",
+        });
+        await oraoVrf.provider.waitForTransaction(txnHash);
 
         console.log(seed);
-        console.log("Your transaction payload is", oraoVrf.requestPayload(seed));
+        console.log(
+            "Your transaction payload is",
+            oraoVrf.requestPayload(seed)
+        );
         console.log("Your transaction hash is", txnHash);
 
         const randomness = await oraoVrf.waitFulfilled(alice.address(), seed);
-        console.log("Your randomness is", randomness);
+        console.log("Your randomness is", randomness, typeof randomness);
     });
 });

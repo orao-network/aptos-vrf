@@ -23,10 +23,67 @@ The `RandomnessData` structure is used to store the requested randomness:
 
 - `responses` field – you may look at this field in case you are willing to perform off-chain verification (there are helpers for this in both SDKs)
 
-### Anatomy of a VRF configuration
+## On-chain example
 
-The `Vrf` structure holds the on-chain VRF data. The field that may be interesting to you are:
+The contract we'll use to illustrate the C2C is a simple single-player Russian Roulette where the outcome of a round is derived from a fulfilled randomness. ([full code is available on GitHub](https://github.com/orao-network/vrf-aptos/tree/master/sdk/examples/move))
 
-- `fee` – randomness request will cost this many small units
-- `fulfillment_authorities` – public keys of fulfillment authorities
-- `coin_type` - coin type to pay fees
+*Note*: the randomness will not be immediately available for your contract, so you'll need to design it in a way that it'll wait for randomness being fulfilled. In our example a player won't be able to start another round until the current one is finished (until the randomness is fulfilled).
+
+### 1. Create the contract
+
+This examples is based on Move programming language.
+
+To perform a C2C call you'll need to add the orao VRF move SDK into the list of your dependencies:
+
+```toml
+[dependencies.AptosFramework]
+git = 'https://github.com/aptos-labs/aptos-core.git'
+rev = 'mainnet'
+subdir = 'aptos-move/framework/aptos-framework'
+
+[dependencies.orao-vrf]
+git = 'https://github.com/orao-network/aptos-vrf.git'
+rev = 'master'
+subdir = 'move'
+```
+
+### 2. Perform a C2C call
+
+- 
+```move
+vrf::request(user, force);
+```
+
+### 3. Use the fulfilled randomness
+
+```move
+let randomness: vector<u8> = vrf::get_randomness(user_addr, *option::borrow(&player_state.force));
+assert!(successfull_outcome(&randomness), E_DEAD);
+```
+
+
+## Off-chain Rust example
+
+This section will illustrate the off-chain usage ([full code is available on GitHub](https://github.com/orao-network/aptos-vrf/tree/master/rust))
+
+### Setup the connection
+
+```rs
+let client = OraoVrf::new(NODE_URL.clone().to_string());
+```
+
+### Create a request
+
+```rs
+let network_config = client.get_network_config().await?;
+let seed = rand::random::<[u8; 32]>().to_vec();
+let hash = client
+    .request(&mut alice, seed.clone(), network_config.coin_type, None)
+    .await?;
+```
+
+### Wait for fulfillment
+
+```rs
+let randomness = wait_fulfilled(&client, &alice.address(), &seed).await?;
+```
