@@ -49,15 +49,14 @@ subdir = 'move'
 
 ### 2. Perform a C2C call
 
-- 
 ```move
-vrf::request(user, force);
+vrf_v2::request(user, force);
 ```
 
 ### 3. Use the fulfilled randomness
 
 ```move
-let randomness: vector<u8> = vrf::get_randomness(user_addr, *option::borrow(&player_state.force));
+let randomness: vector<u8> = vrf_v2::get_randomness(user_addr, *option::borrow(&player_state.force));
 assert!(successfull_outcome(&randomness), E_DEAD);
 ```
 
@@ -69,16 +68,15 @@ This section will illustrate the off-chain usage ([full code is available on Git
 ### Setup the connection
 
 ```rs
-let client = OraoVrf::new(NODE_URL.clone().to_string());
+let client = OraoVrfV2::new(NODE_URL.clone().to_string());
 ```
 
 ### Create a request
 
 ```rs
-let network_config = client.get_network_config().await?;
 let seed = rand::random::<[u8; 32]>().to_vec();
 let hash = client
-    .request(&mut alice, seed.clone(), network_config.coin_type, None)
+    .request(&mut alice, seed.clone(), None)
     .await?;
 ```
 

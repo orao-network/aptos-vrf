@@ -1,11 +1,28 @@
-import {AptosAccount, MaybeHexString, Types} from "aptos";
-import {ORAO_ADDRESS, OraoVrfClient} from ".";
+import { AptosAccount, MaybeHexString, Types } from "aptos";
+import { ORAO_ADDRESS, OraoVrfClient } from ".";
 
 /**
  * Class for working with the ORAO Vrf module, such as requesting randomness and
  * getting fulfilled randomness.
  */
 export class OraoVrfV2Client extends OraoVrfClient {
+    /**
+     * Generate a transaction data to the Aptos blockchain API to
+     * request randomness.
+     *
+     * @param seed Uint8Array
+     * @returns transaction data
+     */
+    requestData(seed: Uint8Array) {
+        return {
+            data: {
+                function: `${ORAO_ADDRESS}::vrf_v2::request` as any,
+                typeArguments: [],
+                functionArguments: [seed],
+            },
+        };
+    }
+
     /**
      * Generate a transaction payload to the Aptos blockchain API to
      * request randomness.
@@ -36,11 +53,25 @@ export class OraoVrfV2Client extends OraoVrfClient {
         seed: Uint8Array,
         options?: Partial<Types.SubmitTransactionRequest>
     ): Promise<string> {
-        return this.submitTransaction(
-            user,
-            this.requestPayload(seed),
-            options
-        );
+        return this.submitTransaction(user, this.requestPayload(seed), options);
+    }
+
+    /**
+     * Generate a transaction data to the Aptos blockchain API to
+     * deposit coins.
+     *
+     * @param coinType
+     * @param amount
+     * @returns transaction data
+     */
+    depositData(coinType: string, amount: Types.U64) {
+        return {
+            data: {
+                function: `${ORAO_ADDRESS}::vrf_v2::deposit` as any,
+                typeArguments: [coinType],
+                functionArguments: [amount],
+            },
+        };
     }
 
     /**
@@ -81,6 +112,24 @@ export class OraoVrfV2Client extends OraoVrfClient {
             this.depositPayload(coinType, amount),
             options
         );
+    }
+
+    /**
+     * Generate a transaction data to the Aptos blockchain API to
+     * withdraw coins.
+     *
+     * @param coinType
+     * @param amount
+     * @returns transaction data
+     */
+    withdrawData(coinType: string, amount: Types.U64) {
+        return {
+            data: {
+                function: `${ORAO_ADDRESS}::vrf_v2::withdraw` as any,
+                typeArguments: [coinType],
+                functionArguments: [amount],
+            },
+        };
     }
 
     /**

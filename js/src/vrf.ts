@@ -1,5 +1,12 @@
-import {AptosAccount, getAddressFromAccountOrAddress, MaybeHexString, Network, Provider, Types,} from "aptos";
-import {ORAO_ADDRESS} from ".";
+import {
+    AptosAccount,
+    getAddressFromAccountOrAddress,
+    MaybeHexString,
+    Network,
+    Provider,
+    Types,
+} from "aptos";
+import { ORAO_ADDRESS } from ".";
 
 /**
  * Class for working with the ORAO Vrf module, such as requesting randomness and
@@ -27,10 +34,24 @@ export class OraoVrfClient {
             options
         );
 
-        const bcsTxn = await this.provider.signTransaction(account, rawTxn);
-        const pendingTxn = await this.provider.submitTransaction(bcsTxn);
+        return await this.provider.signAndSubmitTransaction(account, rawTxn);
+    }
 
-        return pendingTxn.hash;
+    /**
+     * Generate a transaction data to the Aptos blockchain API to
+     * request randomness.
+     *
+     * @param seed Uint8Array
+     * @returns transaction data
+     */
+    requestData(seed: Uint8Array) {
+        return {
+            data: {
+                function: `${ORAO_ADDRESS}::vrf::request` as any,
+                typeArguments: [],
+                functionArguments: [seed],
+            },
+        };
     }
 
     /**
