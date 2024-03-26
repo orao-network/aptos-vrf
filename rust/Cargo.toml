@@ -1,6 +1,6 @@
 [package]
 name = "orao-aptos-vrf"
-version = "0.2.0"
+version = "0.2.1"
 authors = ["ORAO Devs <hello@orao.network>"]
 homepage = "https://orao.network"
 repository = "https://github.com/orao-network/aptos-vrf"
