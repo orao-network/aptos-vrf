@@ -7,8 +7,7 @@ import { ORAO_ADDRESS, OraoVrfClient } from ".";
  */
 export class OraoVrfV2Client extends OraoVrfClient {
     /**
-     * Generate a transaction data to the Aptos blockchain API to
-     * request randomness.
+     * Generate randomness request transaction data ready be submitted by the aptos API / client / wallet
      *
      * @param seed Uint8Array
      * @returns transaction data
