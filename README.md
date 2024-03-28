@@ -1,4 +1,17 @@
-# ORAO VRF for Aptos SDKs
+<h1 align="center">
+  ORAO Aptos VRF
+</h1>
+
+<p>
+  Generate on-chain randomness on Aptos ORAO's Verifiable Random Function for Aptos offers unbiased, fast and affordable randomness for your Aptos modules. Create unique NFT characteristics, generate random levels in games and weapon characteristics, provide unique loot boxes, enable provably fair reward distribution, randomize airdrops and provide secure, verifiable lottery/raffle.
+</p>
+<p align="center">
+  <a href="https://www.npmjs.com/package/@orao-network/aptos-vrf"><img src="https://img.shields.io/npm/v/%40orao-network%2Faptos-vrf?logo=apostrophe&color=purple"
+  /></a>
+</p>
+
+
+
 
 This repository provides JS, Rust and Move SDKs. With these libs you'll be able to request on-chain randomness using ORAO VRF module.
 
@@ -10,7 +23,7 @@ SDK sections:
 ## Examples
 The example section provides three sample apps for each of the SDKs: Move, JS and Rust. Please note that all sample apps utilize testnet network.
 
-+ For [Aptos Move VRF](https://github.com/orao-network/aptos-vrf/tree/master/examples/move) we've built a Russian Roulette game as a move module.
++ For [Aptos Move VRF](https://github.com/orao-network/aptos-vrf/tree/master/examples/move) we've built an onchain Russian Roulette game. ~~This example provides move module and CLI to play the game.~~
 + The [JS example](https://github.com/orao-network/aptos-vrf/tree/master/examples/js) provides a frontend web3 dApp built using React. We integrated Pontem and Petra browser wallets. Any wallet for Aptos blockchain should work provided it generates payloads to spec.
 + There's also a [Rust CLI](https://github.com/orao-network/aptos-vrf/tree/master/examples/rust) app that generates a new wallet, gets an airdrop from aptos testnet, requests and outputs randomness.
 
