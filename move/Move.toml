@@ -1,6 +1,6 @@
 [package]
 name = 'orao-vrf'
-version = '0.1.4'
+version = '0.2.0'
 
 [dependencies.AptosFramework]
 git = 'https://github.com/aptos-labs/aptos-core.git'

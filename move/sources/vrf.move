@@ -1,5 +1,6 @@
 module orao_network::vrf {
     use std::signer;
+    use std::string::String;
     use std::vector;
     use aptos_std::type_info::{Self, TypeInfo};
     use aptos_framework::coin;
@@ -34,6 +35,19 @@ module orao_network::vrf {
         data: Table<vector<u8>, u64>,
     }
 
+    struct CallbackStore has key {
+        // K: seed, V: CallbackData
+        data: Table<vector<u8>, CallbackData>,
+    }
+
+    struct CallbackData has copy, drop, store {
+        module_addr: address,
+        module_name: String,
+        func_name: String,
+        type_args: vector<String>,
+        fee_amount: u64,
+    }
+
     //
     // Functions
     //
@@ -60,6 +74,33 @@ module orao_network::vrf {
         let randomness_store = borrow_global_mut<RandomnessStore>(user_addr);
         assert!(!table::contains(&randomness_store.data, seed), E_ALREADY_REQUESTED);
         table::add(&mut randomness_store.data, seed, timestamp::now_seconds());
+    }
+
+    public(friend) fun register_callback_internal(
+        user: &signer,
+        seed: vector<u8>,
+        module_addr: address,
+        module_name: String,
+        func_name: String,
+        type_args: vector<String>,
+        fee_amount: u64
+    ) acquires CallbackStore {
+        let user_addr = signer::address_of(user);
+        if (!exists<CallbackStore>(user_addr)) {
+            move_to<CallbackStore>(
+                user,
+                CallbackStore {
+                    data: table::new(),
+                }
+            );
+        };
+
+        let callback_store = borrow_global_mut<CallbackStore>(user_addr);
+        table::add(
+            &mut callback_store.data,
+            seed,
+            CallbackData { module_addr, module_name, func_name, type_args, fee_amount }
+        );
     }
 
     #[view]

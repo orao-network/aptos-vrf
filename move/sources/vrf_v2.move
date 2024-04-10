@@ -1,5 +1,6 @@
 module orao_network::vrf_v2 {
     use std::signer;
+    use std::string::String;
     use aptos_std::table::{Self, Table};
     use aptos_std::type_info::{Self, TypeInfo};
     use aptos_framework::account::{Self, SignerCapability};
@@ -137,6 +138,30 @@ module orao_network::vrf_v2 {
         vrf::request_internal(user, seed);
     }
 
+    public entry fun request_with_callback(
+        user: &signer,
+        seed: vector<u8>,
+        module_addr: address,
+        module_name: String,
+        func_name: String,
+        type_args: vector<String>,
+        fee_amount: u64
+    ) acquires TreasuryStore, NetworkFeeStore, EventsStore, TreasuryAccountCapability {
+        request(user, seed);
+
+        let user_addr = signer::address_of(user);
+        let authority_addr = @orao_network;
+        if (get_balance<AptosCoin>(user_addr) >= fee_amount) {
+            let coin_type = type_info::type_of<AptosCoin>();
+            withdraw_internal(signer::address_of(user), coin_type, fee_amount);
+            deposit_internal(authority_addr, coin_type, fee_amount);
+        } else {
+            deposit_for_user<AptosCoin>(user, authority_addr, fee_amount);
+        };
+
+        vrf::register_callback_internal(user, seed, module_addr, module_name, func_name, type_args, fee_amount);
+    }
+
     //
     // Public functions
     //
@@ -206,6 +231,11 @@ module orao_network::vrf_v2 {
     #[view]
     public fun get_randomness(account_addr: address, seed: vector<u8>): vector<u8> {
         vrf::get_randomness(account_addr, seed)
+    }
+
+    #[test_only]
+    public fun init_module_for_test(sender: &signer) {
+        init_module(sender);
     }
 
     //

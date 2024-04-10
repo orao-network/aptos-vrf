@@ -1,6 +1,7 @@
 use std::str::FromStr;
 use std::time::{SystemTime, UNIX_EPOCH};
 
+use crate::orao_vrf_client::VFR_ADDRESS;
 use anyhow::{Context, Result};
 use aptos_sdk::bcs;
 use aptos_sdk::crypto::_once_cell::sync::Lazy;
@@ -18,7 +19,6 @@ use url::Url;
 
 use crate::utils::get_address;
 
-static VFR_ADDRESS: &str = "0xab81318c79a3b65a1f23354494793fcc6c4fa44a69d0c0e656b7b1454ddd1bbf";
 static VRF_V2_GET_BALANCE: Lazy<EntryFunctionId> = Lazy::new(|| {
     format!("{VFR_ADDRESS}::vrf_v2::get_balance")
         .parse()
@@ -112,23 +112,26 @@ impl OraoVrfV2 {
         seed: String,
     ) -> Result<String> {
         let resource_type = self.vrf_address.to_hex_literal() + "::vrf::RandomnessStore";
-        let response = self
+        let randomness_store = self
             .api_client
             .get_resource::<RandomnessStore>(account_addr, &resource_type)
             .await
-            .context("Failed to get randomness store")?;
-        let randomness_store = response.into_inner();
-        let table_handle = get_address(&randomness_store.data.handle)?;
-        let key_type = "vector<u8>";
-        let value_type = "vector<u8>";
-        let randomness = self
+            .context("Failed to get randomness store")?
+            .into_inner();
+        Ok(self
             .api_client
-            .get_table_item(table_handle, key_type, value_type, seed)
+            .get_table_item(
+                get_address(&randomness_store.data.handle)?,
+                "vector<u8>",
+                "vector<u8>",
+                seed,
+            )
             .await
-            .context("Failed to get randomness")?;
-        let randomness_inner = randomness.into_inner();
-        let randomness = randomness_inner.as_str().unwrap();
-        Ok(randomness.to_string())
+            .context("Failed to get randomness")?
+            .into_inner()
+            .as_str()
+            .unwrap()
+            .to_string())
     }
 
     pub async fn deposit(
@@ -231,7 +234,7 @@ impl Default for TransactionOptions {
         Self {
             max_gas_amount: 5_000,
             gas_unit_price: 100,
-            timeout_secs: 10,
+            timeout_secs: 60,
         }
     }
 }
