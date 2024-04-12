@@ -16,7 +16,7 @@ use url::Url;
 
 use crate::utils::get_address;
 
-pub static VFR_ADDRESS: &str = "0xbddd4a0ee657adec6811e7673114d6ce76444b77eb48f32a5d058f86535393ef";
+pub static VFR_ADDRESS: &str = "0xab81318c79a3b65a1f23354494793fcc6c4fa44a69d0c0e656b7b1454ddd1bbf";
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Table {
