@@ -1,11 +1,11 @@
 [package]
 name = 'orao-vrf'
-version = '0.2.0'
+version = '0.2.2'
 
 [dependencies.AptosFramework]
-git = 'https://github.com/aptos-labs/aptos-core.git'
-rev = 'mainnet'
-subdir = 'aptos-move/framework/aptos-framework'
+git = "https://github.com/aptos-labs/aptos-framework.git"
+rev = "mainnet"
+subdir = "aptos-framework"
 
 [addresses]
 orao_network = "0xab81318c79a3b65a1f23354494793fcc6c4fa44a69d0c0e656b7b1454ddd1bbf"

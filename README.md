@@ -37,9 +37,9 @@ To perform a C2C call you'll need to add the orao VRF move SDK into the list of 
 
 ```toml
 [dependencies.AptosFramework]
-git = 'https://github.com/aptos-labs/aptos-core.git'
-rev = 'mainnet'
-subdir = 'aptos-move/framework/aptos-framework'
+git = "https://github.com/aptos-labs/aptos-framework.git"
+rev = "mainnet"
+subdir = "aptos-framework"
 
 [dependencies.orao-vrf]
 git = 'https://github.com/orao-network/aptos-vrf.git'
@@ -56,6 +56,13 @@ vrf_v2::request_with_callback(user, seed, module_addr, module_name, func_name, f
 ### 3. Use the fulfilled randomness
 
 ```move
+/// The callback function is designed with a specific signature:
+/// - It always receives two parameters: the user's address and a seed for randomness.
+/// - Optionally, it can include generic type parameters.
+///
+/// Generic type parameters, if needed, should be specified in the 'type_args' 
+/// parameter when calling 'request_with_callback'. This allows for flexible
+/// and type-safe interactions with various callback implementations.
 public entry fun callback(user_addr: address, seed: vector<u8>) {
     let randomness: vector<u8> = vrf_v2::get_randomness(user_addr, seed);
     assert!(successfull_outcome(&randomness), E_DEAD);

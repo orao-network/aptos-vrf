@@ -56,6 +56,118 @@ export class OraoVrfV2Client extends OraoVrfClient {
     }
 
     /**
+     * Generate randomness request with callback transaction data ready to be submitted by the aptos API / client / wallet
+     *
+     * @param seed Uint8Array
+     * @param callbackModuleAddress string
+     * @param callbackModuleName string
+     * @param callbackFunction string
+     * @param typeArgs string[] allows users of the SDK to specify any additional type information required by their
+     *    custom callback functions when requesting randomness with a callback.
+     * @param feeAmount
+     * @returns transaction data
+     */
+    requestWithCallbackData(
+        seed: Uint8Array,
+        callbackModuleAddress: string,
+        callbackModuleName: string,
+        callbackFunction: string,
+        typeArgs: string[],
+        feeAmount: Types.U64
+    ) {
+        return {
+            data: {
+                function:
+                    `${ORAO_ADDRESS}::vrf_v2::request_with_callback` as any,
+                typeArguments: [],
+                functionArguments: [
+                    seed,
+                    callbackModuleAddress,
+                    callbackModuleName,
+                    callbackFunction,
+                    typeArgs,
+                    feeAmount,
+                ],
+            },
+        };
+    }
+
+    /**
+     * Generate a transaction payload to the Aptos blockchain API to
+     * request randomness with callback.
+     *
+     * @param seed Uint8Array
+     * @param callbackModuleAddress string
+     * @param callbackModuleName string
+     * @param callbackFunction string
+     * @param typeArgs string[] allows users of the SDK to specify any additional type information required by their
+     *    custom callback functions when requesting randomness with a callback.
+     * @param feeAmount
+     * @returns payload
+     */
+    requestWithCallbackPayload(
+        seed: Uint8Array,
+        callbackModuleAddress: string,
+        callbackModuleName: string,
+        callbackFunction: string,
+        typeArgs: string[],
+        feeAmount: Types.U64
+    ) {
+        return {
+            type: "entry_function_payload",
+            function: `${ORAO_ADDRESS}::vrf_v2::request_with_callback`,
+            type_arguments: [],
+            arguments: [
+                seed,
+                callbackModuleAddress,
+                callbackModuleName,
+                callbackFunction,
+                typeArgs,
+                feeAmount,
+            ],
+        };
+    }
+
+    /**
+     * Generate, sign, and submit a transaction to the Aptos blockchain API to
+     * request randomness with callback.
+     *
+     * @param user Account requesting the randomness
+     * @param seed Uint8Array
+     * @param callbackModuleAddress string
+     * @param callbackModuleName string
+     * @param callbackFunction string
+     * @param typeArgs string[] allows users of the SDK to specify any additional type information required by their
+     *    custom callback functions when requesting randomness with a callback.
+     * @param feeAmount
+     * @param options Options allow to overwrite default transaction options.
+     * @returns The hash of the transaction submitted to the API
+     */
+    async requestWithCallback(
+        user: AptosAccount,
+        seed: Uint8Array,
+        callbackModuleAddress: string,
+        callbackModuleName: string,
+        callbackFunction: string,
+        typeArgs: string[],
+        feeAmount: Types.U64,
+        options?: Partial<Types.SubmitTransactionRequest>
+    ): Promise<string> {
+        return this.submitTransaction(
+            user,
+            this.requestWithCallbackPayload(
+                seed,
+                callbackModuleAddress,
+                callbackModuleName,
+                callbackFunction,
+                typeArgs,
+                feeAmount
+            ),
+            options
+        );
+    }
+
+    /**
      * Generate a transaction data to the Aptos blockchain API to
      * deposit coins.
      *

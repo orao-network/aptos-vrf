@@ -54,6 +54,13 @@ module russian_roulette::roulette {
         );
     }
 
+    /// The callback function is designed with a specific signature:
+    /// - It always receives two parameters: the user's address and a seed for randomness.
+    /// - Optionally, it can include generic type parameters.
+    ///
+    /// Generic type parameters, if needed, should be specified in the 'type_args'
+    /// parameter when calling 'request_with_callback'. This allows for flexible
+    /// and type-safe interactions with various callback implementations.
     public entry fun callback(user_addr: address, seed: vector<u8>) acquires GameStore {
         let randomness = vrf_v2::get_randomness(user_addr, seed);
 

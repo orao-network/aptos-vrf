@@ -3,9 +3,9 @@ name = 'russian-roulette'
 version = '1.0.0'
 
 [dependencies.AptosFramework]
-git = 'https://github.com/aptos-labs/aptos-core.git'
-rev = 'mainnet'
-subdir = 'aptos-move/framework/aptos-framework'
+git = "https://github.com/aptos-labs/aptos-framework.git"
+rev = "mainnet"
+subdir = "aptos-framework"
 
 [dependencies.orao-vrf]
 local = "../../move"

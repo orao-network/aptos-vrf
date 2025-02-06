@@ -1,6 +1,6 @@
 {
   "name": "@orao-network/aptos-vrf",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "ORAO Verifiable Random Function for Aptos blockchain",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -14,7 +14,8 @@
     "build": "tsc",
     "test": "ts-mocha -p ./tsconfig.json -t 10000000 tests/**/*.ts",
     "lint": "prettier */*.js \"*/**/*{.js,.ts}\" --check",
-    "lint:fix": "prettier */*.js \"*/**/*{.js,.ts}\" -w"
+    "lint:fix": "prettier */*.js \"*/**/*{.js,.ts}\" -w",
+    "prepublishOnly": "npm run build"
   },
   "author": "ORAO Developers <hello@orao.network> (https://orao.network/)",
   "license": "ISC",
